@@ -1,5 +1,5 @@
 use rand::Rng;
-use std::{fs, io};
+use std::{fs, io, usize};
 
 fn get_random_word() -> String {
     let file_path: &str = "words.txt";
@@ -13,9 +13,15 @@ fn get_random_word() -> String {
 
 fn main() {
     let word_to_guess = get_random_word();
+    // let word_to_guess: &str = "sists";// word_to_guess.trim();
     let word_to_guess: &str = word_to_guess.trim();
     let mut retries: i32 = 0;
     let mut correct_guess = false;
+    let mut separated_word: Vec<(usize, char, bool)> = Vec::new();
+
+    for (i, l) in word_to_guess.char_indices() {
+        separated_word.push((i, l, false));
+    }
 
     println!("the word to guess: {word_to_guess}");
     println!("enter your word");
@@ -53,23 +59,20 @@ fn main() {
         let mut first_indx: i32 = 0;
 
         for letter in word.chars() {
-            let mut second_indx: i32 = 0;
             let mut correct_letter: bool = false;
             let mut correct_index: bool = false;
 
-            for letter_guess in word_to_guess.chars() {
-                if letter != letter_guess {
-                    second_indx += 1;
+            for (i, l, _g) in &mut separated_word {
+                if letter != *l {
                     continue;
                 }
 
                 correct_letter = true;
 
-                if first_indx == second_indx {
+                if first_indx as usize == *i {
                     correct_index = true;
                 }
 
-                break;
             }
 
             if !correct_letter {
