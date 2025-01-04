@@ -1,20 +1,14 @@
 use rand::Rng;
 use std::{fs, io, usize};
 
-fn get_random_word() -> String {
-    let file_path: &str = "words.txt";
-    let file_content = fs::read_to_string(file_path).expect("can't get the file.");
-    let content_lines: Vec<&str> = file_content.lines().collect();
-
-    let rnd_word: usize = rand::thread_rng().gen_range(0..content_lines.len());
-
-    content_lines.get(rnd_word).unwrap().to_string()
-}
-
 fn main() {
-    let word_to_guess = get_random_word();
-    // let word_to_guess: &str = "sists";// word_to_guess.trim();
-    let word_to_guess: &str = word_to_guess.trim();
+    let file_path: &str = "words.txt";
+    let file = fs::read_to_string(file_path).expect("can't get the file.");
+    let words: Vec<&str> = file.lines().collect();
+
+    let rnd_word: usize = rand::thread_rng().gen_range(0..words.len());
+    let word_to_guess = words.get(rnd_word).unwrap().to_string();
+
     let mut retries: i32 = 0;
     let mut correct_guess = false;
     let mut separated_word: Vec<(usize, char, bool)> = Vec::new();
@@ -28,6 +22,7 @@ fn main() {
 
     'begining: while retries < 6 {
         let mut word = String::new();
+        let mut exists_word: bool = false;
 
         io::stdin()
             .read_line(&mut word)
@@ -51,6 +46,18 @@ fn main() {
             }
         };
 
+        for w in &words {
+            if *w == word {
+                exists_word = true;
+                break;
+            }
+        }
+
+        if !exists_word {
+            println!("The word doesn't exists.");
+            continue 'begining;
+        }
+
         if word == word_to_guess {
             correct_guess = true;
             break 'begining;
@@ -72,7 +79,6 @@ fn main() {
                 if first_indx as usize == *i {
                     correct_index = true;
                 }
-
             }
 
             if !correct_letter {
